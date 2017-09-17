@@ -174,14 +174,159 @@ self.addEventListener('fetch', function(e) {
 ```
 
 >Your app is now offline-capable! Let's try it out.
->Test it out.
-    > 1. Reload your page and then go to the Cache Storage pane on the Application panel of DevTools. 
-    > 2. Right click Cache Storage, pick Refresh Caches, expand the section and you should see the name of your app shell cache listed on the left-hand side. 
-    > 3. When you click on your app shell cache you can see all of the resources that it has currently cached.
-    > 4. In Service Worker pane of DevTools and enable the Offline checkbox. After enabling it, you should see a little yellow warning icon next to the Network panel tab. This indicates that you're offline.
-    > 5. Reload your page to see the initial rendering with fake data
+> Test it out.
+>   1. Reload your page and then go to the Cache Storage pane on the Application panel of DevTools. 
+>   2. Right click Cache Storage, pick Refresh Caches, expand the section and you should see the name of your app shell cache listed on the left-hand side. 
+>   3. When you click on your app shell cache you can see all of the resources that it has currently cached.
+>   4. In Service Worker pane of DevTools and enable the Offline checkbox. After enabling it, you should see a little yellow warning icon next to the Network panel tab. This indicates that you're offline.
+>   5. Reload your page to see the initial rendering with fake data
 
 17. Use service workers to cache the forecast data
+18. Add the following line to the top of your service-worker.js file
+```javascript
+var dataCacheName = 'weatherData-v1';
+```
+19. Update the code in activate event handler
+```javascript
+if (key !== cacheName && key !== dataCacheName) {
+```
+20. Update the fetch event
+```javascript
+self.addEventListener('fetch', function(e) {
+  console.log('[Service Worker] Fetch', e.request.url);
+  var dataUrl = 'https://query.yahooapis.com/v1/public/yql';
+  if (e.request.url.indexOf(dataUrl) > -1) {
+    e.respondWith(
+      caches.open(dataCacheName).then(function(cache) {
+        return fetch(e.request).then(function(response){
+          cache.put(e.request.url, response.clone());
+          return response;
+        });
+      })
+    );
+  } else {
+    e.respondWith(
+      caches.match(e.request).then(function(response) {
+        return response || fetch(e.request);
+      })
+    );
+  }
+});
+```
+21. Get data from the cache - Find the TODO add cache logic here comment in app.getForecast() in app.js
+```javascript
+//TODO add cache logic here
+if ('caches' in window) {
+  /*
+    * Check if the service worker has already cached this city's weather
+    * data. If the service worker has the data, then display the cached
+    * data while the app fetches the latest data.
+    */
+  caches.match(url).then(function(response) {
+    if (response) {
+      response.json().then(function updateFromCache(json) {
+        var results = json.query.results;
+        results.key = key;
+        results.label = label;
+        results.created = json.query.created;
+        app.updateForecastCard(results);
+      });
+    }
+  });
+}
+```
+22. Notice how the cache request and the XHR request both end with a call to update the forecast card. How does the app know whether it's displaying the latest data? This is handled in the following code from app.updateForecastCard
+```javascript
+var cardLastUpdatedElem = card.querySelector('.card-last-updated');
+var cardLastUpdated = cardLastUpdatedElem.textContent;
+if (cardLastUpdated) {
+  cardLastUpdated = new Date(cardLastUpdated);
+  // Bail if the card has more recent data then the data
+  if (dataLastUpdated.getTime() < cardLastUpdated.getTime()) {
+    return;
+  }
+}
+```
+> The app should be completely offline-functional now.
+> Test it now.
+>   1. Save a couple of cities and press the refresh button on the app to get fresh weather data
+>   2. then go offline and reload the page.
+>   3. go to the Cache Storage pane on the Application panel of DevTools. Expand the section and you should see the name of your app shell and data cache listed on the left-hand side. Opening the data cache should should the data stored for each city.
+23. Web App Install Banners and Add to Homescreen for Chrome on Android
+24. Create a file named manifest.json in your work folder and copy/paste the following contents
+```json
+{
+  "name": "Weather",
+  "short_name": "Weather",
+  "icons": [{
+    "src": "images/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    }, {
+      "src": "images/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }, {
+      "src": "images/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    }, {
+      "src": "images/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }, {
+      "src": "images/icons/icon-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#3E4EB8",
+  "theme_color": "#2F3BA2"
+}
+```
+25. Tell the browser about your manifest file. Now add the following line to the bottom of the ``` <head> ``` element in your index.html file
+```html
+<link rel="manifest" href="/manifest.json">
+```
+26. Add to Homescreen elements for Safari on iOS. In your index.html, add the following to the bottom of the ``` <head> ``` element
+
+```html
+<!-- Add to home screen for Safari on iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Weather PWA">
+<link rel="apple-touch-icon" href="images/icons/icon-152x152.png">
+```
+27. Tile Icon for Windows. In your index.html, add the following to the bottom of the ``` <head> ``` element
+```html
+<meta name="msapplication-TileImage" content="images/icons/icon-144x144.png">
+<meta name="msapplication-TileColor" content="#2F3BA2">
+```
+> Open up the Manifest pane on the Application panel. you'll be able to see it parsed and displayed in a human-friendly format on this pane.
+
+28. Deploying our application in firebase
+    1. Create a new app at https://firebase.google.com/console/
+    2. open cmd prompt from work folder and run 
+    ```cmd 
+    firebase login 
+    ```
+    3. Initialize your app and provide the directory (likely "./") 
+    ```cmd 
+    firebase init 
+    ```
+    4. Finally, deploy the app to Firebase
+    ```cmd
+    firebase deploy
+    ```
+    5. done! Your app will be deployed to the domain: https://YOUR-FIREBASE-APP.firebaseapp.com
+    
+
+
+
+
+
+
 
 
 
