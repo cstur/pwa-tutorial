@@ -1,0 +1,35 @@
+[debug] [2017-09-17T13:04:40.415Z] ----------------------------------------------------------------------
+[debug] [2017-09-17T13:04:40.419Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\MOHAN RAM\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase deploy
+[debug] [2017-09-17T13:04:40.420Z] CLI Version:   3.11.0
+[debug] [2017-09-17T13:04:40.420Z] Platform:      win32
+[debug] [2017-09-17T13:04:40.420Z] Node Version:  v6.11.2
+[debug] [2017-09-17T13:04:40.421Z] Time:          Sun Sep 17 2017 18:34:40 GMT+0530 (India Standard Time)
+[debug] [2017-09-17T13:04:40.421Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2017-09-17T13:04:40.440Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2017-09-17T13:04:40.441Z] > authorizing via signed-in user
+[debug] [2017-09-17T13:04:40.445Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/weather-app-b30cb  
+ Sun Sep 17 2017 18:34:40 GMT+0530 (India Standard Time)
+[debug] [2017-09-17T13:04:42.821Z] <<< HTTP RESPONSE 200
+[debug] [2017-09-17T13:04:42.826Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/weather-app-b30cb/tokens  
+ Sun Sep 17 2017 18:34:42 GMT+0530 (India Standard Time)
+[debug] [2017-09-17T13:04:44.076Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Deploying to 'weather-app-b30cb'...
+[info] 
+[info] i  deploying hosting
+[info] i  hosting: preparing ./ directory for upload...
+[debug] [2017-09-17T13:04:47.959Z] >>> HTTP REQUEST PUT https://deploy.firebase.com/v1/hosting/weather-app-b30cb/uploads/-KuEwDFs_bh2sj1osOpW?fileCount=26&message=  
+ Sun Sep 17 2017 18:34:47 GMT+0530 (India Standard Time)
+[debug] [2017-09-17T13:04:55.272Z] <<< HTTP RESPONSE 200
+[debug] [2017-09-17T13:04:55.274Z] [hosting] .tgz uploaded successfully, waiting for extraction
+[info] +  hosting: 26 files uploaded successfully
+[info] i  starting release process (may take several minutes)...
+[debug] [2017-09-17T13:05:04.911Z] >>> HTTP REQUEST POST https://deploy.firebase.com/v1/projects/weather-app-b30cb/releases { hosting: 
+   { public: './',
+     ignore: [ 'firebase.json', '**/.*', '**/node_modules/**' ],
+     rewrites: [ [Object] ],
+     version: '-KuEwDFs_bh2sj1osOpW',
+     prefix: '-KuEwDFs_bh2sj1osOpW/',
+     manifest: [] } } 
+ Sun Sep 17 2017 18:35:04 GMT+0530 (India Standard Time)
